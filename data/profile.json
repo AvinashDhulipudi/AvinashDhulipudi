@@ -1,0 +1,43 @@
+{
+    "name": "Avinash Dhulipudi",
+
+    "profilePictureUrl": "images/pictures/profile-picture.jpg",
+    "resumePdfUrl": "",
+
+    "statusCircleVisible": true,
+    "statusCircleVariant": "available",
+    "statusCircleHoverMessage": "status_message_available_for_freelance",
+
+    "locales": {
+        "en": {
+            "localized_name": "Avinash Dhulipudi",
+            "localized_name_stylized": " [[Dhulipudi {{Avinash}}]]",
+            "status_message_available_for_freelance": "Available for freelance!",
+            "roles": [
+                "Backend Developer",
+                "Frontend Developer",
+                "DevOps Engineer"
+            ],
+            "name_pronunciation_ipa": "/Avinash Dhulipudi/",
+            "name_pronunciation_audio_url": ""
+        },
+        "es": {
+            "status_message_available_for_freelance": "¡Disponible para freelance!",
+            "roles": [
+                "Desarrollador Backend",
+                "Desarrollador Frontend",
+                "Ingeniero DevOps",
+                "Diseñador UX"
+            ]
+        },
+        "fr": {
+            "status_message_available_for_freelance": "Disponible pour freelance !",
+            "roles": [
+                "Développeur Backend",
+                "Développeur Frontend",
+                "Ingénieur DevOps",
+                "Designer UX"
+            ]
+        }
+    }
+}
