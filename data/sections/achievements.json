@@ -99,7 +99,7 @@
                     "date": {"year": 2022, "month": 12},
                     "preview": {
                         "links": [
-                            {"href": "", "tooltipString": "read", "faIcon": "fa-solid fa-file-pdf"}
+                            {"href": "https://www.linkedin.com/in/avinash-dhulipudi/overlay/1635510519831/single-media-viewer/?profileId=ACoAACeEdWEBdTUwZgrH5bwiMDE0phwhRZtVRuE", "tooltipString": "open_website", "faIcon": "fa-brands fa-linkedin"}
                         ],
                         "screenshots": [],
                         "screenshotsAspectRatio": "",
@@ -120,7 +120,9 @@
                     "id": 2,
                     "date": {"year": 2024, "month": 6},
                     "preview": {
-                        "links": [],
+                        "links": [
+                            {"href": "https://www.linkedin.com/in/avinash-dhulipudi/overlay/1762111049074/single-media-viewer/?profileId=ACoAACeEdWEBdTUwZgrH5bwiMDE0phwhRZtVRuE", "tooltipString": "open_website", "faIcon": "fa-brands fa-linkedin"}
+                        ],
                         "screenshots": [],
                         "screenshotsAspectRatio": "",
                         "youtubeVideo": ""
