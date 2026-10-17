@@ -12,6 +12,22 @@ dist-ssr
 *.local
 dist/
 
+# Local design review and visual QA artifacts
+/audit-*/
+/content-ux-audit.md
+/design-qa.md
+/design-qa-*.png
+
+# Unoptimized image-generation source files (the site uses the JPG versions)
+/public/images/pictures/hero-collaboration.png
+/public/images/pictures/case-feast-factory.png
+/public/images/pictures/case-apollo-homecare.png
+/public/images/pictures/case-enterprise-modernization.png
+/public/images/pictures/website-pricing-cover.png
+
+# Local reference image; not used by the website
+/public/images/pictures/sankranthi.avif
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json

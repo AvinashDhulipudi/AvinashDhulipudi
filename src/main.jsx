@@ -1,163 +1,144 @@
-import "/src/styles/app.scss"
-import {StrictMode, useEffect, useState} from 'react'
-import {createRoot} from 'react-dom/client'
-import {useApi} from "/src/hooks/api.js"
-import {useConstants} from "/src/hooks/constants.js"
-import {useUtils} from "/src/hooks/utils.js"
-import Preloader from "/src/components/loaders/Preloader.jsx"
-import DataProvider, {useData} from "/src/providers/DataProvider.jsx"
-import LanguageProvider from "/src/providers/LanguageProvider.jsx"
-import ViewportProvider from "/src/providers/ViewportProvider.jsx"
-import ThemeProvider from "/src/providers/ThemeProvider.jsx"
-import LocationProvider from "/src/providers/LocationProvider.jsx"
-import FeedbacksProvider from "/src/providers/FeedbacksProvider.jsx"
-import InputProvider from "/src/providers/InputProvider.jsx"
-import NavigationProvider from "/src/providers/NavigationProvider.jsx"
-import Portfolio from "/src/components/Portfolio.jsx"
+import { StrictMode, useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
+import "./styles/app.scss";
 
-/** Initialization Script... **/
-let container = null
+const BASE = import.meta.env.BASE_URL;
 
-document.addEventListener('DOMContentLoaded', function(event) {
-    if(container)
-        return
+const featuredWork = [
+  {
+    number: "01", category: "Independent build · Website · Commerce", title: "The Feast Factory",
+    summary: "A live catering platform that makes ordering for offices, communities and celebrations simpler—from menu discovery to confirmed booking.",
+    image: "images/pictures/case-feast-factory.jpg", imageAlt: "Modern Indian catering prepared for The Feast Factory case study",
+    proof: "Live customer, admin and API platform", stack: ["Next.js", "React", "NestJS", "PostgreSQL", "Razorpay"],
+    href: "https://thefeastfactory.in/", linkLabel: "Visit the live website",
+    details: [
+      ["Challenge", "Turn meal boxes, packages, venues and service windows into one clear customer journey while keeping pricing authoritative."],
+      ["My role", "Designed and built the customer experience, administration application, APIs, data model, authentication, cart, booking and payment workflows."],
+      ["Result", "An end-to-end platform with menu builders, saved carts, quotes, Razorpay payments, receipts, invoices and booking administration."],
+    ],
+  },
+  {
+    number: "02", category: "Consulting work · Healthcare platform", title: "Apollo HomeCare",
+    summary: "Consulting and engineering contribution to a production healthcare experience spanning care discovery, bookings, diagnostics, equipment and ordering.",
+    image: "images/pictures/case-apollo-homecare.jpg", imageAlt: "Home healthcare consultation for the Apollo HomeCare case study",
+    proof: "Service and commerce", stack: ["Next.js", "TypeScript", "Medusa", "PostgreSQL", "GCP"],
+    details: [
+      ["Challenge", "Bring a broad care catalogue and commerce journey into a fast, resilient experience that works across cities and devices."],
+      ["Consulting contribution", "Worked across the storefront and backend on bookings, catalogues, city availability, authentication, checkout, payments and admin tooling."],
+      ["Result", "Improved production readiness through graceful degradation, cold-start handling, health checks and cloud deployment improvements."],
+    ],
+  },
+  {
+    number: "03", category: "Architecture · Modernization · Cloud", title: "Enterprise lending modernization",
+    summary: "Modernizing a large Java service estate and corporate-credit workflows without interrupting business-critical journeys.",
+    image: "images/pictures/case-enterprise-modernization.jpg", imageAlt: "Modern technology campus representing enterprise platform modernization",
+    proof: "70% lower infrastructure cost", stack: ["Java 21", "Spring Boot", "Docker", "Kubernetes", "GCP"],
+    details: [
+      ["Challenge", "Evolve a mission-critical lending estate while protecting availability, business rules and operational confidence."],
+      ["My role", "Led an AI-assisted Java 21 upgrade across 40+ services and containerized 13 services for Kubernetes-based delivery."],
+      ["Result", "Reduced infrastructure cost by 70% while improving scalability, release consistency and maintainability."],
+    ],
+  },
+];
 
-    container = document.getElementById('root')
-    createRoot(document.getElementById('root')).render(<App/>)
-})
+const additionalWork = [
+  { number: "04", category: "Power Platform · Integration", title: "Corporate-credit journeys", summary: "Dataverse models, Canvas Apps, governed Power Automate flows and secure OData integrations supporting a reduction from roughly 30 days to 2 days for eligible credit processing.", stack: ["Canvas Apps", "Dataverse", "Power Automate", "OData", "Cloud Run", "IAM"] },
+  { number: "05", category: "Applied AI · Platform resilience", title: "Operational intelligence", summary: "Evidence-led paths for fault isolation, release summaries, change review, deployment orchestration and secure knowledge retrieval.", stack: ["RAG", "Embeddings", "AI agents", "Jenkins", "JIRA"] },
+  { number: "06", category: "Independent project · Education · 2020", title: "Fiorello LMS", summary: "Designed and delivered the responsive learning experience, connected frontend journeys to APIs, and prepared the product for release.", stack: ["React", "Node.js", "MongoDB", "REST APIs", "Docker"] },
+];
 
-/**
- * This is the main app component. It wraps the content of the app with AppEssentialsWrapper and AppCapabilitiesWrapper.
- * @return {JSX.Element}
- * @constructor
- */
-const App = () => {
-    return (
-        <AppEssentialsWrapper>
-            <AppCapabilitiesWrapper>
-                <Portfolio/>
-            </AppCapabilitiesWrapper>
-        </AppEssentialsWrapper>
-    )
+const services = [
+  { number: "01", title: "Architecture consulting", lead: "Turn business constraints into systems that teams can actually deliver and operate.", description: "I help define boundaries, integration patterns, data ownership, security decisions and pragmatic modernization roadmaps. I stay close to delivery so the architecture survives contact with production.", outcomes: ["System and solution design", "Modernization planning", "Architecture reviews", "Root-cause and resilience work"] },
+  { number: "02", title: "Websites and digital products", lead: "From a clear professional website to a full commerce or operations platform.", description: "I design and build responsive interfaces, backend services, data models, payments, administration tools and cloud deployment. The solution is sized to the requirement—not padded with unnecessary complexity.", outcomes: ["Business and portfolio websites", "Commerce and booking platforms", "React and Next.js products", "APIs, payments and administration"] },
+  { number: "03", title: "Technical leadership", lead: "Practical direction for teams working through difficult delivery and engineering decisions.", description: "I provide technical direction, critical design and code reviews, mentoring, interview leadership and a structured approach to debugging. I currently lead a 15-person team and support architecture decisions across 50–60 engineers.", outcomes: ["Technical direction", "Engineering mentoring", "Interview panels", "Delivery and quality reviews"] },
+];
+
+const articles = [
+  {
+    category: "Website delivery", read: "8 min read", title: "What does a professional website really cost?",
+    intro: "Projects start from ₹1,00,000. The right quote depends on what the website must achieve, connect to and support after launch.",
+    image: "images/pictures/website-pricing-cover.jpg", imageAlt: "A consultant reviewing a business website and wireframes with clients",
+    prices: [["Starts from ₹1,00,000", "Requirement-based website delivery", "A clear scope, responsive build, essential SEO, analytics, enquiry journeys and launch support. Integrations and product workflows are quoted after discovery."]],
+    body: [
+      "A professional website can start from ₹1,00,000, but that is a starting point rather than a universal package. A focused site for a consultant or small business has very different engineering needs from a product with accounts, payments, live availability and operational workflows.",
+      "Page count matters less than the work behind those pages. Original design, a content-management system, catalogues, payments, authentication, third-party integrations, migration, accessibility, performance targets, infrastructure and long-term support all affect effort and risk.",
+      "Once an engagement includes operational workflows, it is no longer only a website. The Feast Factory is a useful example: its customer experience connects to menus, packages, carts, quotes, bookings, payments, receipts, invoices, administration, APIs and a database.",
+      "You work directly with one accountable technical lead who can move from requirements and UX to frontend, backend, data, payments, cloud and production debugging. I bring enterprise engineering discipline without forcing enterprise complexity onto a straightforward business site.",
+      "My quote starts with a short requirements conversation. I separate must-haves from later phases, identify integrations and content ownership, agree the launch target, and document inclusions, exclusions and assumptions. The proposal then gives you deliverables, milestones, timeline, price and optional ongoing support.",
+      "These ranges are planning guidance, not a fixed menu. Share the business goal, required pages or workflows, integrations, content readiness and preferred launch date, and I will provide a genuine quote in the agreed billing currency.",
+    ],
+  },
+  { category: "Power Platform", read: "10 min read", title: "Canvas Apps, Power Automate and Dataverse that stay reliable", intro: "Data design, delegation, resilient flows, security and ALM for maintainable enterprise solutions.", body: ["Start with Dataverse, not the first screen. Model business ownership, lifecycle, relationships and alternate keys before adding interface logic. Security roles should describe responsibilities, while teams and field-level controls protect access deliberately.", "Canvas Apps stay maintainable when screens compose reusable components and named formulas instead of duplicating rules. Delegation must be validated against production-scale data because a filter that looks right in development can silently return incomplete results later.", "Power Automate deserves the same discipline as any integration service: explicit trigger contracts, idempotency, deliberate retries, correlation identifiers, failure scopes and a human recovery path.", "Solutions, publishers, connection references, environment variables and data-loss-prevention policies form the ALM boundary. A repeatable route to production lets apps, flows and the data model evolve as one governed product."] },
+  { category: "Java engineering", read: "11 min read", title: "Optimizing Java services: measure the whole request path", intro: "Java 21 profiling, JVM memory, concurrency, database access and the guardrails that keep gains real.", body: ["Optimization begins with a precise symptom and a representative workload. Baseline throughput, error rate and p50, p95 and p99 latency, then follow a slow request across the API, dependencies and database.", "Java Flight Recorder and allocation profiling reveal expensive call paths, object churn, lock contention and retained heap. Examine pause time and allocation rate before changing heap sizes or garbage collectors.", "Java 21 virtual threads can simplify high-concurrency blocking I/O, but they do not create more database connections or downstream capacity. Pools, timeouts, bulkheads and back-pressure must be sized as one system.", "A change is complete only when the same load test proves the improvement without moving the bottleneck or weakening correctness. Regression thresholds and production telemetry preserve the gain through future releases."] },
+  { category: "Cloud architecture", read: "7 min read", title: "Operating Kubernetes on GCP with fewer surprises", intro: "Workload boundaries, probes, resource policy and observability practices for dependable platforms.", body: ["Reliability starts before deployment YAML. Workloads need clear ownership, graceful shutdown, meaningful readiness and liveness probes, and resource requests based on observed behaviour.", "On GCP, I prefer workload identity over long-lived keys, centralized logging with useful correlation fields, and releases that make rollback ordinary. Autoscaling should follow a signal connected to user impact, not CPU by habit.", "A cluster is an operating environment, not the architecture. Simpler service boundaries and rehearsed failure handling create more resilience than another controller."] },
+  { category: "Problem solving", read: "5 min read", title: "Debugging from symptom to root cause", intro: "A disciplined way to isolate intermittent failures, test explanations and improve the next investigation.", body: ["Strong debugging begins by making the symptom precise: who is affected, when it starts, what changed and which evidence distinguishes a cause from a coincidence.", "Narrow the system at its boundaries—client, API, dependency, data and infrastructure—and choose the smallest experiment that can disprove a hypothesis. Logs help only when they share identifiers and answer a concrete question.", "After the fix, capture the root cause, the conditions that allowed it and the missing signal that made diagnosis slow. The best resolution prevents the defect and shortens the next investigation."] },
+];
+
+const routeMap = { "": "home", top: "home", work: "work", expertise: "services", services: "services", writing: "journal", journal: "journal", about: "about" };
+function currentRoute() { const key = window.location.hash.replace(/^#\/?/, "").split("/")[0]; return routeMap[key] || "home"; }
+function LinkButton({ href, children, tone = "dark" }) { return <a className={`button button-${tone}`} href={href}>{children}</a>; }
+
+function Header({ page }) {
+  const [open, setOpen] = useState(false);
+  const links = [["Projects", "work"], ["Consulting", "services"], ["Insights", "journal"], ["About", "about"]];
+  return <header className="site-header">
+    <a className="brand" href="#/" onClick={() => setOpen(false)}><span className="brand-mark">LL</span><span><strong>Laxmi Lancer™</strong><small>Avinash Dhulipudi · Independent engineering studio</small></span></a>
+    <button className="menu-button" type="button" aria-expanded={open} onClick={() => setOpen(value => !value)}>{open ? "Close" : "Menu"}</button>
+    <nav className={open ? "main-nav is-open" : "main-nav"} aria-label="Main navigation">
+      {links.map(([label, route]) => <a className={page === route ? "active" : ""} href={`#/${route}`} key={route} onClick={() => setOpen(false)}>{label}</a>)}
+      <a className="nav-contact" href="mailto:avinashdhulipudi4444@gmail.com?subject=Project%20or%20consulting%20enquiry">Discuss a project</a>
+    </nav>
+  </header>;
 }
 
-/**
- * This stack will wrap the entire app - these are considered essential components for the app booting up.
- * @param children
- * @return {JSX.Element}
- * @constructor
- */
-const AppEssentialsWrapper = ({children}) => {
-    const api = useApi()
-    const utils = useUtils()
-    const constants = useConstants()
+function SectionHeading({ eyebrow, title, intro }) { return <div className="section-heading"><div><p className="eyebrow">{eyebrow}</p><h2>{title}</h2></div>{intro && <p>{intro}</p>}</div>; }
 
-    const [settings, setSettings] = useState()
+function ContactBand() { return <section className="contact-band"><p className="eyebrow">Available for selected freelance, consulting and full-time conversations</p><h2>Bring me the problem.<br /><em>I’ll help make it clear.</em></h2><p>Tell me what you are building, where it is stuck and what a good outcome looks like. I’ll reply with a practical next step.</p><LinkButton href="mailto:avinashdhulipudi4444@gmail.com?subject=Project%20or%20consulting%20enquiry" tone="light">Email Avinash</LinkButton></section>; }
 
-    useEffect(() => {
-        if (window.location.pathname !== utils.file.BASE_URL)
-            window.history.pushState({}, '', utils.file.BASE_URL)
+function ArchitectureSection() { return <section className="architecture-section"><div className="page-width architecture-grid"><div className="architecture-copy"><p className="eyebrow">Architecture with delivery in mind</p><h2>Systems that make sense <em>on the diagram and in production.</em></h2><p>I connect user experience, APIs, Java services, Power Platform, applied AI, cloud infrastructure and data into one accountable design. The goal is not a complicated picture—it is clear ownership, secure boundaries and a system a team can operate.</p><div className="architecture-principles"><div><strong>01</strong><span>Business journeys first</span></div><div><strong>02</strong><span>Secure integration boundaries</span></div><div><strong>03</strong><span>Observable by design</span></div></div><a className="text-link light-link" href="#/services">Explore architecture consulting</a></div><figure><img src={`${BASE}images/pictures/architecture-blueprint.jpg`} alt="Blueprint showing web, API, Java, Power Platform, AI, Kubernetes and data architecture" /><figcaption>Reference architecture · shaped to the requirement, not copied from a template</figcaption></figure></div></section>; }
 
-        utils.file.loadJSON("/data/settings.json").then(response => {
-            _applyDeveloperSettings(response)
-            setSettings(response)
+function RemoteDeliverySection() { return <section className="remote-section"><div className="page-width remote-grid"><figure><img src={`${BASE}images/pictures/remote-delivery-blueprint.jpg`} alt="Blueprint showing a remote delivery workflow from discovery through release" /><figcaption>Remote delivery model · discover, design, build, review and release</figcaption></figure><div className="remote-copy"><p className="eyebrow">Remote delivery</p><h2>Distance should not reduce <em>clarity or ownership.</em></h2><p>I work from Hyderabad with clients and collaborators across locations. Every engagement has a visible plan, written decisions, working demonstrations and clear release ownership—so progress never depends on being in the same room.</p><ul><li><strong>Async by default</strong><span>Short written decisions, recorded context and fewer meetings without outcomes.</span></li><li><strong>Progress you can inspect</strong><span>Milestones, demonstrations and risks stay visible throughout delivery.</span></li><li><strong>Secure collaboration</strong><span>Least-privilege access, controlled environments and careful handling of client data.</span></li><li><strong>Timezone-aware cadence</strong><span>Planned overlap for decisions, with uninterrupted build time between reviews.</span></li></ul></div></div></section>; }
 
-            const consoleMessageForDevelopers = response?.consoleMessageForDevelopers
-            if(consoleMessageForDevelopers) {
-                const primaryColor = utils.css.getRootSCSSVariable('--bs-primary')
-                utils.log.info(consoleMessageForDevelopers.title, consoleMessageForDevelopers.items, primaryColor)
-            }
-        })
+function BitsNetworkSection() { return <section className="bits-section"><div className="page-width bits-grid"><figure><img src={`${BASE}images/pictures/bits-pilani-campus.jpg`} alt="An editorial campus view representing BITS Pilani" /><figcaption><strong>BITS Pilani</strong><span>B.E. Computer Science · 2016–2020</span></figcaption></figure><div><p className="eyebrow">Built at BITS Pilani</p><h2>A strong foundation.<br /><em>A trusted network.</em></h2><p>I started building software in college and still draw on the curiosity, discipline and friendships formed there. When an engagement needs deeper frontend, platform, data, AI or security expertise, I can collaborate with trusted fellow BITS Pilani engineers while remaining the accountable technical lead.</p><p className="bits-note">One direct relationship for you. A broader specialist network when the work genuinely needs it.</p><a className="text-link" href="#/about">Read my story</a></div></div></section>; }
 
-        api.analytics.reportVisit().then(() => {})
-    }, [])
+function HomePage() { return <main>
+  <section className="hero page-width"><div className="hero-copy"><p className="eyebrow">Architecture · Products · Websites</p><h1>Complex ideas, turned into <em>dependable digital products.</em></h1><p className="hero-lede">I’m Avinash Dhulipudi—an architecture consultant and hands-on engineer based in Hyderabad. I help businesses make sound technical decisions, build professional websites and deliver software that holds up after launch.</p><div className="hero-actions"><LinkButton href="mailto:avinashdhulipudi4444@gmail.com?subject=Project%20or%20consulting%20enquiry">Discuss your project</LinkButton><LinkButton href="#/work" tone="outline">See projects</LinkButton></div><p className="hero-note">Independent through Laxmi Lancer™ · Remote-ready delivery · Trusted BITS Pilani collaborators when specialist depth helps</p></div><figure className="hero-image"><img src={`${BASE}images/pictures/hero-collaboration.jpg`} alt="An engineering team collaborating on a technical problem" /><figcaption><span>Hyderabad, India</span><span>Working with clients worldwide</span></figcaption></figure></section>
+  <section className="proof-strip" aria-label="Experience highlights"><div><strong>10+</strong><span>years building software</span></div><div><strong>6+</strong><span>years independent delivery</span></div><div><strong>50–60</strong><span>engineers supported</span></div><div><strong>BITS Pilani</strong><span>trusted collaborator network</span></div></section>
+  <section className="page-section page-width"><SectionHeading eyebrow="How I help" title="Strategy when you need it. Delivery where it counts." intro="A senior consulting lens with enough hands-on depth to take responsibility for what gets shipped." /><div className="service-list">{services.map(service => <article className="service-summary" key={service.number}><span>{service.number}</span><div><h3>{service.title}</h3><p>{service.lead}</p></div><a href="#/services">View service</a></article>)}</div></section>
+  <section className="page-section work-preview"><div className="page-width"><SectionHeading eyebrow="Project evidence" title="The work is where the promise becomes real." intro="Independent builds, consulting contributions and enterprise modernization—clearly separated, with the role and outcome explained." /><div className="project-teaser"><div><span>Independent build</span><h3>The Feast Factory</h3><p>A live website and operating platform for modern catering.</p></div><div><span>Consulting work</span><h3>Apollo HomeCare</h3><p>Healthcare storefront, bookings, commerce and cloud readiness.</p></div><div><span>Enterprise architecture</span><h3>Lending modernization</h3><p>Java, Kubernetes, Power Platform and measurable operational gains.</p></div></div><LinkButton href="#/work" tone="outline">Explore all projects</LinkButton></div></section>
+  <ArchitectureSection />
+  <BitsNetworkSection />
+  <section className="page-section page-width journal-preview"><SectionHeading eyebrow="Field notes" title="Useful thinking, shared openly." intro="Practical writing for clients and engineering teams—without hiding the trade-offs." /><div className="journal-feature"><img src={`${BASE}images/pictures/website-pricing-cover.jpg`} alt="A website planning conversation between a consultant and clients" /><div><p className="eyebrow">Website delivery · 8 min read</p><h3>{articles[0].title}</h3><p>{articles[0].intro}</p><a className="text-link" href="#/journal">Read the article</a></div></div></section>
+  <ContactBand />
+</main>; }
 
-    const _applyDeveloperSettings = (settings) => {
-        const developerSettings = settings?.developerSettings
-        const debugMode = developerSettings?.debugMode
-        const fakeEmailRequests = developerSettings?.fakeEmailRequests
-        const stayOnThePreloaderScreen = developerSettings?.stayOnThePreloaderScreen
+function WorkPage() { return <main>
+  <section className="page-intro page-width"><p className="eyebrow">Projects and consulting work</p><h1>Built to launch.<br /><em>Designed to last.</em></h1><p>Independent products, consulting contributions and enterprise modernization—each showing what I owned, how I approached the problem and what changed.</p></section>
+  <section className="case-page page-width">{featuredWork.map((project, index) => <article className={`case-feature ${index % 2 ? "reverse" : ""}`} key={project.number}><img src={`${BASE}${project.image}`} alt={project.imageAlt} /><div className="case-copy"><div className="project-meta"><span>{project.number}</span><span>{project.category}</span></div><h2>{project.title}</h2><p className="case-summary">{project.summary}</p><strong className="case-proof">{project.proof}</strong><div className="case-details">{project.details.map(([title, text]) => <div key={title}><h3>{title}</h3><p>{text}</p></div>)}</div><div className="tag-row">{project.stack.map(tag => <span key={tag}>{tag}</span>)}</div>{project.href && <a className="project-visit" href={project.href} target="_blank" rel="noreferrer">{project.linkLabel} ↗</a>}</div></article>)}</section>
+  <RemoteDeliverySection />
+  <section className="more-work page-width"><SectionHeading eyebrow="More project evidence" title="Focused engagements. Useful outcomes." intro="Power Platform delivery, applied AI and the Fiorello learning platform." />{additionalWork.map(project => <article key={project.number}><div className="project-meta"><span>{project.number}</span><span>{project.category}</span></div><h3>{project.title}</h3><p>{project.summary}</p><div className="tag-row">{project.stack.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</section>
+  <ContactBand />
+</main>; }
 
-        if(constants.PRODUCTION_MODE)
-            return settings
+function ServicesPage() { return <main><section className="page-intro page-width"><p className="eyebrow">Architecture and delivery consulting</p><h1>Clear decisions.<br /><em>Confident delivery.</em></h1><p>Bring me a difficult technical decision, a product that needs shaping or a website that must do more than look polished. I will help turn the requirement into a practical route to production.</p></section><section className="service-page page-width">{services.map(service => <article key={service.number}><span className="service-number">{service.number}</span><div><h2>{service.title}</h2><p className="service-lead">{service.lead}</p></div><div><p>{service.description}</p><ul>{service.outcomes.map(item => <li key={item}>{item}</li>)}</ul></div></article>)}</section><section className="website-offer"><div className="page-width website-offer-grid"><div><p className="eyebrow">Website projects</p><h2>Start with the outcome.<br /><em>Price the real requirement.</em></h2><p>Professional website engagements start from ₹1,00,000. The final quote reflects the content, design, integrations, workflows and launch support your business actually needs.</p><a className="text-link light-link" href="#/journal">How website estimates work</a></div><div className="price-start"><span>Starts from</span><strong>₹1,00,000</strong><p>Requirement discovery, responsive delivery and a clear written scope before build.</p></div></div></section><section className="page-section page-width process-section"><SectionHeading eyebrow="How engagements run" title="Clear decisions before heavy delivery." intro="A lightweight process that keeps scope, progress and ownership visible." /><ol><li><span>01</span><h3>Understand</h3><p>Business goal, audience, workflows, constraints and what success should look like.</p></li><li><span>02</span><h3>Shape</h3><p>Scope, architecture, milestones, assumptions, risks and a requirement-based quote.</p></li><li><span>03</span><h3>Build</h3><p>Visible progress, working software, practical feedback loops and production readiness.</p></li><li><span>04</span><h3>Support</h3><p>Launch, handover, documentation and optional ongoing improvement.</p></li></ol></section><ContactBand /></main>; }
 
-        if(debugMode) {
-            settings.preloaderSettings.enabled = stayOnThePreloaderScreen
-            settings.templateSettings.backgroundStyle = "plain"
-            utils.storage.setWindowVariable("suspendAnimations", true)
-            utils.log.warn("DataProvider", "Debug Mode is enabled, so transitions and animated content—such as the preloader screen, background animations, and role text typing—will be skipped. You can disable it manually on settings.json or by running the app on PROD_MODE, which disables it by default.")
-        }
+function JournalPage() { return <main><section className="page-intro page-width"><p className="eyebrow">Engineering insights</p><h1>Better decisions.<br /><em>Fewer expensive surprises.</em></h1><p>Practical notes for clients and engineering teams on websites, architecture, Power Platform, Java, cloud delivery and root-cause debugging.</p></section><section className="article-list page-width">{articles.map((article, index) => <details className="article" key={article.title}><summary>{article.image && <img src={`${BASE}${article.image}`} alt={article.imageAlt} />}<div className="article-index">0{index + 1}</div><div><div className="article-meta"><span>{article.category}</span><span>{article.read}</span></div><h2>{article.title}</h2><p>{article.intro}</p><span className="read-label">Read insight</span></div></summary><div className="article-body">{article.prices && <div className="price-guide">{article.prices.map(([price, label, text]) => <div key={price}><strong>{price}</strong><h3>{label}</h3><p>{text}</p></div>)}</div>}<div className="article-columns">{article.body.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div>{index === 0 && <LinkButton href="mailto:avinashdhulipudi4444@gmail.com?subject=Website%20project%20quote&body=Business%20goal%3A%0ARequired%20pages%20or%20workflows%3A%0AIntegrations%3A%0ATarget%20launch%20date%3A%0ABudget%20range%3A">Request a requirement-based quote</LinkButton>}<span className="close-note">Select the title again to close</span></div></details>)}</section><ContactBand /></main>; }
 
-        if(fakeEmailRequests) {
-            utils.storage.setWindowVariable("fakeEmailRequests", true)
-            utils.log.warn("DataProvider", "Fake email requests are enabled. This is only for development purposes and will be disabled automatically in production.")
-        }
+function AboutPage() { return <main><section className="about-hero page-width"><div><p className="eyebrow">Engineer · Consultant · Builder</p><h1>Curious by nature.<br /><em>Accountable by choice.</em></h1><p>I started building software at BITS Pilani and have spent 10+ years learning how technology, people and business decisions fit together.</p></div><img src={`${BASE}images/pictures/hero-collaboration.jpg`} alt="Engineers collaborating around a table" /></section><section className="about-story page-width"><div><p className="eyebrow">The short version</p></div><div><p className="large-copy">I’m a Senior Consultant Specialist and Technical Lead at HSBC Technology India, based in Hyderabad. I lead a 15-person team and support architecture decisions across 50–60 engineers.</p><p>Alongside my corporate career, I have delivered independent products through Laxmi Lancer™ since 2020, including The Feast Factory and Fiorello’s learning platform. My consulting work has also included engineering contributions to Apollo HomeCare.</p><p>I’m at my best when a system feels difficult: clarifying the real constraint, debugging the root cause and turning the fix into a more resilient design. I also mentor graduates, review critical changes and interview Java, React and AI candidates.</p></div></section><section className="career-section"><div className="page-width"><SectionHeading eyebrow="Experience" title="From hands-on engineer to architecture lead." /><div className="career-list"><article><span>Sep 2020 — now</span><div><h3>HSBC Technology India</h3><p>Enterprise lending, cloud, Power Platform, applied AI and technical leadership.</p><ol><li>Trainee Software Engineer</li><li>Software Engineer</li><li>Senior Software Engineer</li><li>Consultant Specialist</li><li>Senior Consultant Specialist</li></ol></div></article><article><span>2020 — now</span><div><h3>Laxmi Lancer™ · Independent work</h3><p>Professional websites, full-stack digital products and engineering engagements for growing businesses.</p></div></article><article><span>Mar — Jul 2020</span><div><h3>Fiorello Technologies</h3><p>UI/UX, responsive frontend delivery, API integration and release preparation for an LMS.</p></div></article><article><span>Jul — Dec 2019</span><div><h3>BlueJeans Networks</h3><p>Production video-calling UI modernization, accessibility and P1/P2 defect resolution.</p></div></article><article><span>2016 — 2020</span><div><h3>B.E. Computer Science · BITS Pilani</h3><p>The foundation for a trusted network of collaborators and a career in engineering.</p></div></article></div></div></section><section className="values page-width"><SectionHeading eyebrow="Working principles" title="Professional does not have to mean distant." /><div><article><span>01</span><h3>Tell the truth early</h3><p>Clear risks, realistic trade-offs and a quote grounded in the actual requirement.</p></article><article><span>02</span><h3>Own the outcome</h3><p>Architecture, quality and delivery remain connected rather than handed between silos.</p></article><article><span>03</span><h3>Leave the system better</h3><p>Useful documentation, stronger diagnostics and decisions the next team can understand.</p></article></div></section><ContactBand /></main>; }
 
-        if(stayOnThePreloaderScreen) {
-            utils.storage.setWindowVariable("stayOnThePreloaderScreen", true)
-            utils.log.warn("DataProvider", "Preloader screen will be displayed indefinitely because the developer flag 'stayOnThePreloaderScreen' is on. This is only for development purposes and will be disabled automatically in production.")
-        }
-    }
+function Footer() { return <footer className="site-footer"><div className="page-width footer-grid"><div><a className="brand footer-brand" href="#/"><span className="brand-mark">LL</span><span><strong>Laxmi Lancer™</strong><small>Independent engineering studio</small></span></a><p>Architecture consulting, technical leadership and website development from Hyderabad, India.</p></div><div><h3>Explore</h3><a href="#/work">Projects</a><a href="#/services">Consulting</a><a href="#/journal">Insights</a><a href="#/about">About</a></div><div><h3>Connect</h3><a href="mailto:avinashdhulipudi4444@gmail.com">Email</a><a href="https://github.com/AvinashDhulipudi" target="_blank" rel="noreferrer">GitHub</a><a href="https://www.linkedin.com/in/avinash-dhulipudi/" target="_blank" rel="noreferrer">LinkedIn</a></div><div className="copyright">© {new Date().getFullYear()} Avinash Dhulipudi<br />Laxmi Lancer™</div></div></footer>; }
 
-    return (
-        <StrictMode>
-            {settings && (
-                <Preloader preloaderSettings={settings["preloaderSettings"]}>
-                    <DataProvider settings={settings}>
-                        {children}
-                    </DataProvider>
-                </Preloader>
-            )}
-        </StrictMode>
-    )
+function App() {
+  const [page, setPage] = useState(currentRoute());
+  useEffect(() => { const onHashChange = () => { setPage(currentRoute()); window.scrollTo({ top: 0, behavior: "auto" }); }; window.addEventListener("hashchange", onHashChange); return () => window.removeEventListener("hashchange", onHashChange); }, []);
+  useEffect(() => { const titles = { home: "Avinash Dhulipudi — Architecture, Websites & Technical Leadership", work: "Projects — Avinash Dhulipudi", services: "Architecture & Delivery Consulting — Avinash Dhulipudi", journal: "Engineering Insights — Avinash Dhulipudi", about: "About — Avinash Dhulipudi" }; document.title = titles[page]; }, [page]);
+  const pages = { home: <HomePage />, work: <WorkPage />, services: <ServicesPage />, journal: <JournalPage />, about: <AboutPage /> };
+  return <div className="site-shell"><Header page={page} />{pages[page]}<Footer /></div>;
 }
 
-/**
- * This stack will wrap the app capabilities - these will be initialized after the app has booted up and loaded its essential components.
- * @param children
- * @return {JSX.Element}
- * @constructor
- */
-const AppCapabilitiesWrapper = ({ children }) => {
-    const data = useData()
+const appRoot = createRoot(document.getElementById("root"));
+appRoot.render(<StrictMode><App /></StrictMode>);
 
-    const [selectedThemeId, setSelectedThemeId] = useState(null)
-
-    const appSettings = data.getSettings()
-    const appStrings = data.getStrings()
-    const appSections = data.getSections()
-    const appCategories = data.getCategories()
-
-    const supportedLanguages = appSettings["supportedLanguages"]
-    const supportedThemes = appSettings["supportedThemes"]
-    const defaultLanguageId = appSettings["templateSettings"].defaultLanguageId
-    const defaultThemeId = appSettings["templateSettings"].defaultThemeId
-    const animatedCursorEnabled = appSettings["templateSettings"].animatedCursorEnabled
-    const showSpinnerOnThemeChange = appSettings["templateSettings"].showSpinnerOnThemeChange
-
-    return (
-        <LanguageProvider supportedLanguages={supportedLanguages}
-                          defaultLanguageId={defaultLanguageId}
-                          appStrings={appStrings}
-                          selectedThemeId={selectedThemeId}>
-            <ViewportProvider>
-                <InputProvider>
-                    <FeedbacksProvider canHaveAnimatedCursor={animatedCursorEnabled}>
-                        <ThemeProvider supportedThemes={supportedThemes}
-                                       defaultThemeId={defaultThemeId}
-                                       showSpinnerOnThemeChange={showSpinnerOnThemeChange}
-                                       onThemeChanged={setSelectedThemeId}>
-                            <LocationProvider sections={appSections}
-                                              categories={appCategories}>
-                                <NavigationProvider sections={appSections}
-                                                    categories={appCategories}>
-                                    {children}
-                                </NavigationProvider>
-                            </LocationProvider>
-                        </ThemeProvider>
-                    </FeedbacksProvider>
-                </InputProvider>
-            </ViewportProvider>
-        </LanguageProvider>
-    )
+if (import.meta.hot) {
+  import.meta.hot.dispose(() => appRoot.unmount());
 }
