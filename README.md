@@ -1,6 +1,6 @@
 # Avinash Dhulipudi — Portfolio
 
-A focused, responsive portfolio for Avinash Dhulipudi: full-stack engineer working across enterprise systems, cloud modernization, web products and applied AI.
+A focused, responsive portfolio for Avinash Dhulipudi: architecture consultant, full-stack engineer and sole proprietor of Laxmi Lancer, with 10+ successful projects and websites across enterprise systems, cloud modernization, digital products and applied AI.
 
 ## Run locally
 
